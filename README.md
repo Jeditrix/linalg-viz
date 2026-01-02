@@ -13,18 +13,12 @@ A Python library for visualizing linear algebra concepts. Perfect for students l
 ## Installation
 
 ```bash
-pip install git+https://github.com/Jeditrix/linalg-viz.git
-```
-
-This automatically installs all dependencies (numpy, pygame, PyOpenGL, pillow).
-
-### For Development
-
-```bash
 git clone https://github.com/Jeditrix/linalg-viz.git
 cd linalg-viz
-pip install -e .
+pip install -r requirements.txt
 ```
+
+That's it! Now you can run the examples.
 
 ## Quick Start
 
