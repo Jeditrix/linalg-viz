@@ -88,30 +88,29 @@ class MatrixScene:
             glClearColor(*Colors.BACKGROUND)
             glClear(GL_COLOR_BUFFER_BIT)
 
-            # Current highlighted row
-            current_row = min(self._animation_step, rows - 1)
-
             # Layout
             start_x = 50
             start_y = 100
             spacing = 40
 
+            # The row we're currently calculating (0-indexed)
+            calc_row = self._animation_step - 1 if self._animation_step > 0 else -1
+
             # Draw title
             self._display._draw_text("Matrix × Vector = Result", start_x, 30, (200, 200, 200),
                                      self._display._font_large)
 
-            # Draw matrix with highlighted row
-            mw, mh = self._display.draw_matrix(matrix, start_x, start_y,
-                                                highlight_row=current_row if self._animation_step < rows else -1)
+            # Draw matrix with highlighted row (matches calculation)
+            highlight_row = calc_row if 0 <= calc_row < rows else -1
+            mw, mh = self._display.draw_matrix(matrix, start_x, start_y, highlight_row=highlight_row)
 
             # Draw multiply sign
             x = start_x + mw + spacing
             self._display.draw_multiply(x, start_y, mh)
 
-            # Draw vector with highlighted element
+            # Draw vector with highlighted element (matches calculation)
             x += spacing + 20
-            vw, vh = self._display.draw_vector(vector, x, start_y,
-                                               highlight_idx=current_row if self._animation_step < rows else -1)
+            vw, vh = self._display.draw_vector(vector, x, start_y, highlight_idx=highlight_row)
 
             # Draw equals
             x += vw + spacing
@@ -125,21 +124,20 @@ class MatrixScene:
 
             if self._animation_step > 0:
                 self._display.draw_vector(result_partial, x, start_y, color=(100, 255, 100),
-                                          highlight_idx=current_row - 1 if self._animation_step <= rows else -1)
+                                          highlight_idx=highlight_row)
 
             # Show current calculation
-            if self._animation_step > 0 and self._animation_step <= rows:
-                row_idx = self._animation_step - 1
+            if 0 <= calc_row < rows:
                 calc_y = start_y + mh + 60
 
                 # Build calculation string with clean formatting
                 terms = []
                 for j in range(cols):
-                    m_val = self._display._format_number(matrix[row_idx, j])
+                    m_val = self._display._format_number(matrix[calc_row, j])
                     v_val = self._display._format_number(vector[j])
                     terms.append(f"{m_val}×{v_val}")
-                result_val = self._display._format_number(result[row_idx])
-                calc_str = f"Row {row_idx + 1}: " + " + ".join(terms) + f" = {result_val}"
+                result_val = self._display._format_number(result[calc_row])
+                calc_str = f"Row {calc_row + 1}: " + " + ".join(terms) + f" = {result_val}"
                 self._display._draw_text(calc_str, start_x, calc_y, (255, 255, 100))
 
             # Draw controls hint
@@ -175,31 +173,31 @@ class MatrixScene:
             glClearColor(*Colors.BACKGROUND)
             glClear(GL_COLOR_BUFFER_BIT)
 
-            # Current position in result matrix
-            current_idx = min(self._animation_step, rows_a * cols_b - 1)
-            current_row = current_idx // cols_b
-            current_col = current_idx % cols_b
-
             # Layout
             start_x = 30
             start_y = 100
             spacing = 30
 
+            # The cell we're currently calculating (0-indexed)
+            calc_idx = self._animation_step - 1 if self._animation_step > 0 else -1
+            calc_row = calc_idx // cols_b if calc_idx >= 0 else -1
+            calc_col = calc_idx % cols_b if calc_idx >= 0 else -1
+
             # Draw title
             self._display._draw_text("Matrix × Matrix = Result", start_x, 30, (200, 200, 200),
                                      self._display._font_large)
 
-            # Draw matrix A with highlighted row
-            highlight_r = current_row if self._animation_step < total_steps - 1 else -1
+            # Draw matrix A with highlighted row (matches calculation)
+            highlight_r = calc_row if 0 <= calc_idx < rows_a * cols_b else -1
             mw_a, mh_a = self._display.draw_matrix(A, start_x, start_y, highlight_row=highlight_r)
 
             # Draw multiply sign
             x = start_x + mw_a + spacing
             self._display.draw_multiply(x, start_y, mh_a)
 
-            # Draw matrix B with highlighted column
+            # Draw matrix B with highlighted column (matches calculation)
             x += spacing + 10
-            highlight_c = current_col if self._animation_step < total_steps - 1 else -1
+            highlight_c = calc_col if 0 <= calc_idx < rows_a * cols_b else -1
             mw_b, mh_b = self._display.draw_matrix(B, x, start_y, highlight_col=highlight_c)
 
             # Draw equals
@@ -214,26 +212,22 @@ class MatrixScene:
                 result_partial[r, c] = result[r, c]
 
             if self._animation_step > 0:
-                prev_row = (current_idx - 1) // cols_b if current_idx > 0 else -1
-                prev_col = (current_idx - 1) % cols_b if current_idx > 0 else -1
                 self._display.draw_matrix(result_partial, x, start_y, color=(100, 255, 100),
-                                          highlight_row=prev_row if self._animation_step < total_steps else -1,
-                                          highlight_col=prev_col if self._animation_step < total_steps else -1)
+                                          highlight_row=highlight_r,
+                                          highlight_col=highlight_c)
 
             # Show current calculation
-            if self._animation_step > 0 and self._animation_step < total_steps:
+            if 0 <= calc_idx < rows_a * cols_b:
                 calc_y = start_y + max(mh_a, mh_b) + 60
-                prev_idx = self._animation_step - 1
-                r, c = prev_idx // cols_b, prev_idx % cols_b
 
                 # Build calculation string with clean formatting
                 terms = []
                 for k in range(cols_a):
-                    a_val = self._display._format_number(A[r, k])
-                    b_val = self._display._format_number(B[k, c])
+                    a_val = self._display._format_number(A[calc_row, k])
+                    b_val = self._display._format_number(B[k, calc_col])
                     terms.append(f"{a_val}×{b_val}")
-                result_val = self._display._format_number(result[r, c])
-                calc_str = f"C[{r+1},{c+1}]: " + " + ".join(terms) + f" = {result_val}"
+                result_val = self._display._format_number(result[calc_row, calc_col])
+                calc_str = f"C[{calc_row+1},{calc_col+1}]: " + " + ".join(terms) + f" = {result_val}"
                 self._display._draw_text(calc_str, start_x, calc_y, (255, 255, 100))
 
             # Draw controls hint
@@ -268,12 +262,14 @@ class MatrixScene:
             glClearColor(*Colors.BACKGROUND)
             glClear(GL_COLOR_BUFFER_BIT)
 
-            current_idx = min(self._animation_step, n - 1)
-
             # Layout
             start_x = 100
             start_y = 150
             spacing = 40
+
+            # The element we're currently calculating (0-indexed)
+            calc_idx = self._animation_step - 1 if self._animation_step > 0 else -1
+            highlight_idx = calc_idx if 0 <= calc_idx < n else -1
 
             # Draw title
             self._display._draw_text("Vector Dot Product: a · b", start_x, 50, (200, 200, 200),
@@ -284,7 +280,7 @@ class MatrixScene:
             x = start_x + 50
             aw, ah = self._display.draw_vector(a, x, start_y - 20,
                                                color=(255, 150, 150),
-                                               highlight_idx=current_idx if self._animation_step < n else -1)
+                                               highlight_idx=highlight_idx)
 
             # Draw dot
             x += aw + spacing
@@ -296,14 +292,14 @@ class MatrixScene:
             x += 50
             bw, bh = self._display.draw_vector(b, x, start_y - 20,
                                                color=(150, 150, 255),
-                                               highlight_idx=current_idx if self._animation_step < n else -1)
+                                               highlight_idx=highlight_idx)
 
             # Draw equals and result
             x += bw + spacing
             self._display.draw_equals(x, start_y - 20, ah)
 
             x += spacing + 20
-            if self._animation_step >= n:
+            if self._animation_step > n:
                 result_text = self._display._format_number(result)
                 self._display._draw_text(result_text, x, start_y + 10, (100, 255, 100),
                                          self._display._font_large)
