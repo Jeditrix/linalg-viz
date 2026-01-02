@@ -4,6 +4,8 @@ A simple to use Python library for visualizing linear algebra concepts.
 
 ![Matrix Multiplication](assets/matrix_multiply.gif)
 
+![3D Transform](assets/linear_transform_3d.gif)
+
 ## Features
 
 - **Vector Visualization**: Display 2D and 3D vectors with arrows on a coordinate grid
