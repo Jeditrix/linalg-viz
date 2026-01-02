@@ -1,6 +1,6 @@
 # linalg-viz
 
-A Python library for visualizing linear algebra concepts. Perfect for students learning linear algebra or anyone who wants to see vectors, matrices, and transformations in action.
+A simple to use Python library for visualizing linear algebra concepts. 
 
 ## Features
 
@@ -18,7 +18,7 @@ cd linalg-viz
 pip install -r requirements.txt
 ```
 
-That's it! Now you can run the examples.
+
 
 ## Quick Start
 
