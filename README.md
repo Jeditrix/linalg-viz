@@ -1,6 +1,8 @@
 # linalg-viz
 
-A simple to use Python library for visualizing linear algebra concepts. 
+A simple to use Python library for visualizing linear algebra concepts.
+
+![Matrix Multiplication](assets/matrix_multiply.gif)
 
 ## Features
 
@@ -145,19 +147,41 @@ scene.show()
 
 ## Examples
 
-The `linalg_viz/examples/` folder contains runnable examples. Just run them directly:
+The `linalg_viz/examples/` folder contains runnable examples:
 
-```bash
-cd linalg_viz/examples
+| Example | Command |
+|---------|---------|
+| ![Basic Vectors](assets/basic_vectors.gif) | `python basic_vectors.py` |
+| ![Linear Transform](assets/linear_transform.gif) | `python linear_transform.py` |
+| ![3D Vectors](assets/basic_3d.gif) | `python basic_3d.py` |
+| ![Matrix × Vector](assets/matrix_vector.gif) | `python matrix_vector_arithmetic.py` |
+| ![Matrix × Matrix](assets/matrix_multiply.gif) | `python matrix_matrix_arithmetic.py` |
+| ![Dot Product](assets/dot_product.gif) | `python dot_product_arithmetic.py` |
 
-python basic_vectors.py          # Basic 2D vectors
-python linear_transform.py       # Linear transformation animation
-python eigenvectors.py           # Eigenvector visualization
-python basic_3d.py               # 3D vectors
-python cross_product.py          # Cross product
-python matrix_vector_arithmetic.py   # Matrix × vector step-by-step
-python matrix_matrix_arithmetic.py   # Matrix × matrix step-by-step
-python dot_product_arithmetic.py     # Dot product step-by-step
+## GIF Export
+
+Export animations to GIF for documentation or sharing:
+
+```python
+from linalg_viz import MatrixScene
+import numpy as np
+
+scene = MatrixScene()
+
+# Matrix-vector multiplication
+M = np.array([[2, -1], [0, 4]])
+v = np.array([1, 2])
+scene.record_matrix_vector_multiply(M, v, "matrix_vector.gif")
+
+# Matrix-matrix multiplication
+A = np.array([[1, 2], [3, 4]])
+B = np.array([[5, 6], [7, 8]])
+scene.record_matrix_multiply(A, B, "matrix_multiply.gif")
+
+# Dot product
+a = np.array([2, 3, 4])
+b = np.array([1, -2, 3])
+scene.record_dot_product(a, b, "dot_product.gif")
 ```
 
 ## API Reference
@@ -206,10 +230,15 @@ m.transpose()                 # Transpose
 ```python
 MatrixScene(width=1000, height=600, title="Matrix Visualization")
 
-# Methods (show animated step-by-step arithmetic)
+# Interactive animations (opens window)
 scene.show_matrix_vector_multiply(matrix, vector)
 scene.show_matrix_multiply(A, B)
 scene.show_dot_product(a, b)
+
+# Export to GIF
+scene.record_matrix_vector_multiply(matrix, vector, "output.gif")
+scene.record_matrix_multiply(A, B, "output.gif")
+scene.record_dot_product(a, b, "output.gif")
 ```
 
 ### Scene
